@@ -24,14 +24,12 @@ class MainActivity : ComponentActivity() {
                 onLocationClick = {
                     startActivity(Intent(this, LocationActivity::class.java))
                 },
-                onCalculatorClick = {},
-                onMediaPlayerClick = {}
-//                onCalculatorClick = {
-//                    startActivity(Intent(this, CalculatorActivity::class.java))
-//                },
-//                onMediaPlayerClick = {
-//                    startActivity(Intent(this, MediaPlayerActivity::class.java))
-//                }
+                onCalculatorClick = {
+                    startActivity(Intent(this, CalculatorActivity::class.java))
+                },
+                onMediaPlayerClick = {
+                    startActivity(Intent(this, MediaPlayerActivity::class.java))
+                }
             )
         }
     }
