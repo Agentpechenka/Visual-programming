@@ -1,0 +1,103 @@
+\chapter{Теоретическая часть}
+
+\subsection{Jetpack Compose}
+Jetpack Compose представляет собой декларативный подход к разработке пользовательских интерфейсов.
+В отличие от традиционного XML, в Compose UI описывается c помощью функций на Kotlin \cite{kotlin-doc}.
+Это упрощает разработку и позволяет избежать избыточности кода.
+Например, элемент интерфейса может быть создан как простая функция:
+
+\begin{lstlisting}
+@Composable
+fun Greeting(name: String) {
+    Text(text = "Hello $name!")
+}
+\end{lstlisting}
+
+
+\subsection{MediaPlayer API}
+Для воспроизведения аудио в Android используется класс \texttt{MediaPlayer}\cite{android-mediaplayer}. Он предоставляет следующие возможности:
+\begin{itemize}
+  \item Загрузка локальных и удалённых аудиофайлов;
+  \item Поддержка различных форматов (MP3, WAV, OGG и др.);
+  \item Управление воспроизведением (пауза, стоп, перемотка);
+  \item Работа в фоновом режиме.
+\end{itemize}
+
+Пример использования MediaPlayer:
+
+\begin{lstlisting}
+val player = MediaPlayer()
+player.setDataSource("path/to/file.mp3")
+player.prepare()
+player.start()
+\end{lstlisting}
+
+\subsection{Система разрешений в Android}
+
+Начиная с Android 6.0 (API 23), система безопасности требует запроса разрешений во время выполнения (runtime permissions). Для доступа к файлам, расположенным во внешнем хранилище, необходимо явно запрашивать разрешение у пользователя. Android разделяет разрешения на два типа: обычные (normal) и опасные (dangerous). Чтение медиафайлов относится ко второму типу.
+
+С Android 13 (API 33) были введены новые отдельные разрешения, включая \texttt{READ\_MEDIA\_AUDIO}\cite{android-permissions}, позволяющее приложению читать только аудиофайлы. Это позволяет более точно контролировать доступ приложений к пользовательским данным.
+
+В Jetpack Compose для запроса разрешения используется специальный механизм:
+
+\begin{lstlisting}
+val launcher = rememberLauncherForActivityResult(
+    ActivityResultContracts.RequestPermission()
+) { isGranted ->
+    if (isGranted) {
+        // Разрешение получено
+    }
+}
+\end{lstlisting}
+
+\subsection{Работа с состоянием в Compose}
+
+Jetpack Compose использует реактивную модель состояния. Это означает, что UI автоматически обновляется при изменении состояния. Для хранения состояния используется API \texttt{remember} и \texttt{mutableStateOf}:
+
+\begin{lstlisting}
+var isPlaying by remember { mutableStateOf(false) }
+
+Button(onClick = { isPlaying = !isPlaying }) {
+    Text(if (isPlaying) "Pause" else "Play")
+}
+\end{lstlisting}
+
+Состояния в Compose позволяют создавать динамические и отзывчивые интерфейсы без необходимости ручного обновления UI-элементов.
+
+\subsection{Обработка жизненного цикла и ресурсов}
+
+При работе с мультимедиа важно учитывать жизненный цикл активности. Объекты, такие как \texttt{MediaPlayer}, требуют ручного освобождения ресурсов во избежание утечек памяти. Compose предоставляет функцию \texttt{DisposableEffect}, которая позволяет управлять ресурсами:
+
+\begin{lstlisting}
+DisposableEffect(Unit) {
+    onDispose {
+        player.release()
+    }
+}
+\end{lstlisting}
+
+Это особенно полезно для компонентов, которые не управляются фреймворком напрямую, как в случае с Java- или Android-классами.
+
+\subsection{Архитектурные подходы: MVVM}
+
+Несмотря на то, что демонстрационное приложение реализовано в одном файле, для более масштабных проектов рекомендуется использовать архитектурный паттерн MVVM (Model-View-ViewModel). В нём:
+
+\begin{itemize}
+  \item \textbf{Model} — содержит бизнес-логику и доступ к данным (например, загрузка аудиофайлов);
+  \item \textbf{ViewModel} — содержит состояние UI и бизнес-логику, обрабатывает события;
+  \item \textbf{View} — Jetpack Compose-компоненты, подписанные на данные ViewModel.
+\end{itemize}
+
+Jetpack предоставляет библиотеку \texttt{androidx.lifecycle.viewmodel.compose.viewModel}, которая позволяет интегрировать ViewModel в Compose-приложения.
+
+\subsection{Преимущества использования Jetpack Compose}
+
+Jetpack Compose обладает рядом преимуществ по сравнению с традиционным подходом через XML:
+
+\begin{itemize}
+  \item Более простая и лаконичная запись интерфейсов;
+  \item Возможность полной декларативности и реактивности;
+  \item Отличная поддержка LiveData и Flow;
+  \item Интеграция с архитектурными компонентами Android;
+  \item Улучшенная совместимость с Kotlin.
+\end{itemize}
